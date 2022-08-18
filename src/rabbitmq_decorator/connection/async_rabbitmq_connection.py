@@ -1,19 +1,19 @@
 import asyncio
-import os
 from asyncio import AbstractEventLoop
 from logging import Logger
 from threading import Thread
 from typing import Callable
 
-from pika import ConnectionParameters, PlainCredentials, SelectConnection
+from pika import ConnectionParameters, SelectConnection
 from pika.channel import Channel
 from pika.exceptions import AMQPConnectionError, ConnectionClosedByClient
 
-from ._logger import _LOGGER
+from .base_connection import BaseConnection
+from .._logger import _LOGGER
 
 
-class RabbitMQConnection:
-    DEFAULT_RABBITMQ_PORT = 5672
+class AsyncRabbitMQConnection(BaseConnection):
+    _connection: SelectConnection
 
     def __init__(
             self,
@@ -25,20 +25,13 @@ class RabbitMQConnection:
             **kwargs
     ) -> None:
 
-        self._host = kwargs.get("rabbitmq_host", os.environ.get("RABBITMQ_HOST"))
-        self._port = int(kwargs.get("rabbitmq_port", os.environ.get("RABBITMQ_PORT", self.DEFAULT_RABBITMQ_PORT)))
-        self._credentials = PlainCredentials(
-            username=kwargs.get("rabbitmq_username", os.environ.get("RABBITMQ_USERNAME")),
-            password=kwargs.get("rabbitmq_password", os.environ.get("RABBITMQ_PASSWORD"))
-        )
+        super().__init__(logger, **kwargs)
 
         self._on_connection_open_cb = on_connection_open
         self._on_connection_closed_cb = on_connection_closed
         self._on_connection_stop_called_cb = on_connection_stop_called
         self._event_loop = event_loop if event_loop else asyncio.get_event_loop()
-        self._connection: SelectConnection = None
         self._closing = False
-        self._logger = logger
 
     def close_connection(self):
         if self._connection.is_closing or self._connection.is_closed:

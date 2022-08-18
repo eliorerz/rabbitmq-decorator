@@ -6,10 +6,10 @@ from typing import Callable, List
 
 from pika.amqp_object import Method
 
-from .exchange import DECORATOR_ATTRIBUTE
+from ._common import DECORATOR_ATTRIBUTE
 from .rabbitmq_consumer import RabbitMQConsumer
-from src.rabbitmq_decorator._logger import _LOGGER
-from src.rabbitmq_decorator.rabbitmq_connection import RabbitMQConnection
+from ._logger import _LOGGER
+from .connection import AsyncRabbitMQConnection
 
 
 class RabbitMQHandler:
@@ -19,7 +19,7 @@ class RabbitMQHandler:
         self._connection_kwargs = connection_kwargs
         self._consumers: List[RabbitMQConsumer] = []
         self._event_loop = event_loop if event_loop else asyncio.get_event_loop()
-        self._connection = RabbitMQConnection(
+        self._connection = AsyncRabbitMQConnection(
             event_loop=event_loop,
             on_connection_open=self._on_connection_open,
             **self._connection_kwargs
@@ -51,7 +51,7 @@ class RabbitMQHandler:
 
             self._connection.create_channel(on_open_callback=cb)
 
-    def start_consume(self, consumer_instance):
+    def start_consume(self, consumer_instance: object):
         self._consumer_instance = consumer_instance
         self._connection.connect()
 

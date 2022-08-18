@@ -1,4 +1,3 @@
-import json
 from asyncio.events import AbstractEventLoop
 from threading import Thread
 from typing import Callable
@@ -9,15 +8,9 @@ from pika.channel import Channel
 from pika.exceptions import ChannelClosedByClient
 from pika.spec import Basic
 
-from .exchange import Exchange, DECORATOR_ATTRIBUTE
-from src.rabbitmq_decorator.exceptions import InvalidConsumerFunctionError
-from src.rabbitmq_decorator._logger import _LOGGER
-
-
-class MessageDecodingMethods:
-    JSON = json.loads
-    BYTES = bytes
-    STRING = lambda msg: msg.decode()  # noqa
+from ._common import Exchange, DECORATOR_ATTRIBUTE, MessageDecodingMethods
+from .exceptions import InvalidConsumerFunctionError
+from ._logger import _LOGGER
 
 
 class RabbitMQConsumer:
