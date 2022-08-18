@@ -65,7 +65,7 @@ async def main():
 
 if __name__ == '__main__':
     some_class = SomeClass()
-    some_class.start_consume(some_class)
+    rabbit_handler.start_consume(some_class)
     event_loop.run_until_complete(main())
-    some_class.stop_consume(some_class)
+    rabbit_handler.stop_consume(some_class)
 ```
