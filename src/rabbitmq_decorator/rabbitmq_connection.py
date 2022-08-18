@@ -9,7 +9,7 @@ from pika import ConnectionParameters, PlainCredentials, SelectConnection
 from pika.channel import Channel
 from pika.exceptions import AMQPConnectionError, ConnectionClosedByClient
 
-from .logger import _LOGGER
+from ._logger import _LOGGER
 
 
 class RabbitMQConnection:

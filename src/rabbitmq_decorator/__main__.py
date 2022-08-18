@@ -2,8 +2,7 @@ import asyncio
 import os
 from typing import Dict, Any
 
-from .consumer import RabbitMQConsumer, RabbitMQHandler, Exchange, RabbitConsumerInterface
-
+from . import RabbitMQHandler, RabbitMQConsumer, Exchange
 
 PASSWORD = os.environ.get("RABBITMQ_PASSWORD")
 USERNAME = os.environ.get("RABBITMQ_USERNAME")
@@ -18,16 +17,15 @@ async def main(cls):
     while i < 4:
         await asyncio.sleep(1)
         i += 1
-    cls.stop()
+    consumer.stop_consume()
     await asyncio.sleep(2)
-    cls.start(cls)
 
 
 consumer = RabbitMQHandler(event_loop=event_loop)
 
 
 @consumer
-class SomeClass(RabbitConsumerInterface):
+class SomeClass:
 
     def __init__(self, x: int = 1) -> None:
         self.x = x
@@ -43,8 +41,7 @@ class SomeClass(RabbitConsumerInterface):
 
 if __name__ == '__main__':
     cls = SomeClass()
-    cls.start(cls)
-
+    consumer.start_consume(cls)
     event_loop.run_until_complete(main(cls))
 
     # asyncio.run(main())

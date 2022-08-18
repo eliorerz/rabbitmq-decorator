@@ -7,14 +7,6 @@ from pika.exchange_type import ExchangeType
 DECORATOR_ATTRIBUTE = "__decorator__"
 
 
-class RabbitConsumerInterface:
-    def start(self, consumer_iface):
-        pass
-
-    def stop(self):
-        pass
-
-
 @dataclass
 class Exchange:
     exchange: str

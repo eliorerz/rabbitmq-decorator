@@ -9,9 +9,9 @@ from pika.channel import Channel
 from pika.exceptions import ChannelClosedByClient
 from pika.spec import Basic
 
-from .rabbit_consumer_interface import RabbitConsumerInterface, Exchange, DECORATOR_ATTRIBUTE
-from ..exceptions import InvalidConsumerFunctionError
-from ..logger import _LOGGER
+from .exchange import Exchange, DECORATOR_ATTRIBUTE
+from src.rabbitmq_decorator.exceptions import InvalidConsumerFunctionError
+from src.rabbitmq_decorator._logger import _LOGGER
 
 
 class MessageDecodingMethods:
@@ -70,7 +70,7 @@ class RabbitMQConsumer:
             channel: Channel,
             on_channel_closed: Callable,
             event_loop: AbstractEventLoop,
-            consumer_instance: RabbitConsumerInterface
+            consumer_instance: object
     ):
         self.channel = channel
         self._event_loop = event_loop
@@ -198,7 +198,7 @@ class RabbitMQConsumer:
         if self.channel:
             self.channel.close()
 
-    def get_callback(self, parent: RabbitConsumerInterface, event_loop: AbstractEventLoop):
+    def get_callback(self, parent: object, event_loop: AbstractEventLoop):
         def on_message(channel: Channel, basic_deliver: Basic.Deliver, properties: BasicProperties, body: bytes):
             """Invoked by pika when a message is delivered from RabbitMQ. The channel is passed for your convenience.
             The basic_deliver object that is passed in carries the exchange, routing key, delivery tag and a redelivered

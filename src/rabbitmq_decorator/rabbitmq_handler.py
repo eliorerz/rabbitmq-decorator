@@ -6,13 +6,13 @@ from typing import Callable, List
 
 from pika.amqp_object import Method
 
-from .rabbit_consumer_interface import RabbitConsumerInterface, DECORATOR_ATTRIBUTE
+from .exchange import DECORATOR_ATTRIBUTE
 from .rabbitmq_consumer import RabbitMQConsumer
-from ..logger import _LOGGER
-from ..rabbitmq_connection import RabbitMQConnection
+from src.rabbitmq_decorator._logger import _LOGGER
+from src.rabbitmq_decorator.rabbitmq_connection import RabbitMQConnection
 
 
-class RabbitMQHandler(RabbitConsumerInterface):
+class RabbitMQHandler:
     DEFAULT_RABBITMQ_PORT = 5672
 
     def __init__(self, event_loop: AbstractEventLoop = None, logger: Logger = _LOGGER, **connection_kwargs) -> None:
@@ -33,8 +33,6 @@ class RabbitMQHandler(RabbitConsumerInterface):
         consumers = [func for func in attributes if isinstance(func, Callable) and hasattr(func, DECORATOR_ATTRIBUTE)]
         self._consumers = [getattr(func, DECORATOR_ATTRIBUTE) for func in consumers]
 
-        klass.start = self.start
-        klass.stop = self.stop
         return klass
 
     def on_channel_closed(self):
@@ -53,14 +51,14 @@ class RabbitMQHandler(RabbitConsumerInterface):
 
             self._connection.create_channel(on_open_callback=cb)
 
-    def start(self, consumer_instance):
+    def start_consume(self, consumer_instance):
         self._consumer_instance = consumer_instance
         self._connection.connect()
 
     def is_consuming(self):
         return all(c.consuming for c in self._consumers)
 
-    def stop(self):
+    def stop_consume(self):
         """Cleanly shutdown the connection to RabbitMQ by stopping the consumer with RabbitMQ.
         When RabbitMQ confirms the cancellation, on_cancelok will be invoked by pika, which will then
         closing the channel and connection. The IOLoop is started again because this method is invoked
