@@ -3,6 +3,7 @@ from ._common import DECORATOR_ATTRIBUTE, Exchange, ExchangeType, MessageDecodin
 from .connection import AsyncRabbitMQConnection, BaseConnection, RabbitMQConnection
 from .rabbitmq_consumer import RabbitMQConsumer
 from .rabbitmq_handler import RabbitMQHandler
+from .rabbitmq_producer import RabbitMQProducer
 
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "AsyncRabbitMQConnection",
     "BaseConnection",
     "RabbitMQConnection",
+    "RabbitMQProducer",
     "exceptions"
 ]

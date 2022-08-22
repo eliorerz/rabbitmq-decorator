@@ -39,8 +39,11 @@ class RabbitMQConsumer:
 
         setattr(function, DECORATOR_ATTRIBUTE, self)
         self._function = function
-        self._queue_name = function.__name__
         return function
+
+    def set_queue_name(self, parent_name: str):
+        """Parent class name"""
+        self._queue_name = f"{parent_name}_{self._function.__name__}"
 
     @property
     def exchange(self) -> Exchange:
@@ -48,7 +51,7 @@ class RabbitMQConsumer:
 
     @property
     def queue_name(self) -> str:
-        return self._queue_name
+        return self._queue_name or self._function.__name__
 
     @property
     def routing_key(self) -> str:

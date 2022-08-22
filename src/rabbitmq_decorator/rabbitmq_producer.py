@@ -19,9 +19,11 @@ class RabbitMQProducer:
 
     def publish(self, message: RabbitMQMessage, exchange: Exchange = None):
         if self._connection.is_closed():
+            self._logger.info("Connection is closed. Opening connection")
             self._connection.open()
 
-        channel = self.__get_channel(exchange or self._exchange)
+        exchange = exchange or self._exchange
+        channel = self.__get_channel(exchange)
         channel.basic_publish(exchange.exchange, message.routing_key, message.get_encoded_body())
 
     def __get_channel(self, exchange: Exchange) -> Channel:

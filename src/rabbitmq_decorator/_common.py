@@ -4,8 +4,7 @@ from typing import Dict, Any
 
 from pika.exchange_type import ExchangeType
 
-
-DECORATOR_ATTRIBUTE = "__decorator__"
+DECORATOR_ATTRIBUTE = "__consumer_decorator__"
 
 
 @dataclass
