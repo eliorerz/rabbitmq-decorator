@@ -4,7 +4,7 @@ import os
 
 class _Logger:
     ENVIRONMENT_VARIABLE_NAME = "LOGGING_LEVEL"
-    DEFAULT_DEBUG_LEVEL = logging.INFO
+    DEFAULT_DEBUG_LEVEL = logging.ERROR
     __colors_set = False
     __instance = None
 
@@ -13,8 +13,10 @@ class _Logger:
         self.__logger = logging.getLogger(name)
         self.__level = level
         self.__logger.setLevel(level)
-        self.__format = logging.Formatter(f"%(levelname)-14s | %(asctime)s | %(name)-10s | "
-                                          f"%(funcName)-10s | %(module)s:%(lineno)-5d | %(message)s\033[1;0m")
+        self.__format = logging.Formatter(
+            "%(levelname)-14s | %(asctime)s | %(name)-10s | "
+            "%(funcName)-10s | %(module)s:%(lineno)-5d | %(message)s\033[1;0m"
+        )
         self.__add_stdout_handler()
         self.__set_colors()
 
@@ -29,7 +31,7 @@ class _Logger:
                 var_name = f"{cls.ENVIRONMENT_VARIABLE_NAME}_{name.upper()}"
             level = int(os.environ[var_name])
         except BaseException:
-            """ TypeError, ValueError, KeyError"""
+            """TypeError, ValueError, KeyError"""
         return level
 
     @classmethod
@@ -66,7 +68,6 @@ class _Logger:
 
 
 class Logger:
-
     def __new__(cls, name) -> logging.Logger:
         return _Logger(name, _Logger.get_debug_level(name)).logger
 

@@ -8,9 +8,9 @@ from pika.channel import Channel
 from pika.exceptions import ChannelClosedByClient
 from pika.spec import Basic
 
-from ._common import Exchange, DECORATOR_ATTRIBUTE, MessageDecodingMethods
-from .exceptions import InvalidConsumerFunctionError
+from ._common import DECORATOR_ATTRIBUTE, Exchange, MessageDecodingMethods
 from ._logger import _LOGGER
+from .exceptions import InvalidConsumerFunctionError
 
 
 class RabbitMQConsumer:
@@ -34,8 +34,9 @@ class RabbitMQConsumer:
 
     def __call__(self, function: Callable):
         if hasattr(function, DECORATOR_ATTRIBUTE):
-            raise InvalidConsumerFunctionError(f"Cannot use function with attribute {DECORATOR_ATTRIBUTE} as rabbitmq "
-                                               f"consumer")
+            raise InvalidConsumerFunctionError(
+                f"Cannot use function with attribute {DECORATOR_ATTRIBUTE} as rabbitmq " f"consumer"
+            )
 
         setattr(function, DECORATOR_ATTRIBUTE, self)
         self._function = function
@@ -57,16 +58,8 @@ class RabbitMQConsumer:
     def routing_key(self) -> str:
         return self._routing_key
 
-    @property
-    def routing_key(self) -> str:
-        return self._routing_key
-
     def on_channel_open(
-            self,
-            channel: Channel,
-            on_channel_closed: Callable,
-            event_loop: AbstractEventLoop,
-            consumer_instance: object
+        self, channel: Channel, on_channel_closed: Callable, event_loop: AbstractEventLoop, consumer_instance: object
     ):
         self.channel = channel
         self._event_loop = event_loop
@@ -113,7 +106,10 @@ class RabbitMQConsumer:
         _LOGGER.info(f"Declaring exchange: {exchange_name}")
         self.channel.exchange_declare(callback=self.on_exchange_declareok, **self.exchange.all())
 
-    def on_exchange_declareok(self, _unused_frame: Method, ):
+    def on_exchange_declareok(
+        self,
+        _unused_frame: Method,
+    ):
         """Invoked by pika when RabbitMQ has finished the Exchange.Declare RPC command.
         :param _unused_frame: Exchange.DeclareOk response frame
         """
@@ -134,8 +130,9 @@ class RabbitMQConsumer:
         :param _unused_frame: The Queue.DeclareOk frame
         """
         _LOGGER.info(f"Binding {self.exchange.exchange} to {self.queue_name} with {self.routing_key}")
-        self.channel.queue_bind(self.queue_name, self.exchange.exchange, routing_key=self.routing_key,
-                                callback=self.on_bindok)
+        self.channel.queue_bind(
+            self.queue_name, self.exchange.exchange, routing_key=self.routing_key, callback=self.on_bindok
+        )
 
     def on_bindok(self, _unused_frame: Method):
         """Invoked by pika when the Queue.Bind method has completed.
@@ -173,8 +170,7 @@ class RabbitMQConsumer:
         _LOGGER.info("Issuing consumer related RPC commands")
         self.add_on_cancel_callback()
         self.consumer_tag = self.channel.basic_consume(
-            self.queue_name,
-            self.get_callback(self._consumer_instance, self._event_loop)
+            self.queue_name, self.get_callback(self._consumer_instance, self._event_loop)
         )
         self._was_consuming = True
         self.consuming = True
@@ -216,8 +212,10 @@ class RabbitMQConsumer:
         return on_message
 
     def _on_handle_message_exception(self, channel: Channel, basic_deliver: Basic.Deliver, exception: BaseException):
-        _LOGGER.error(f"{exception.__class__.__name__}: Error in callback {self._function.__name__}, delivery_tag={basic_deliver.delivery_tag}, "
-                      f"{exception}")
+        _LOGGER.error(
+            f"{exception.__class__.__name__}: Error in callback {self._function.__name__}, "
+            f"delivery_tag={basic_deliver.delivery_tag}, {exception}"
+        )
         channel.basic_ack(delivery_tag=basic_deliver.delivery_tag)
 
     def basic_cancel(self, callback=None):

@@ -8,21 +8,21 @@ from pika import ConnectionParameters, SelectConnection
 from pika.channel import Channel
 from pika.exceptions import AMQPConnectionError, ConnectionClosedByClient
 
-from .base_connection import BaseConnection
 from .._logger import _LOGGER
+from .base_connection import BaseConnection
 
 
 class AsyncRabbitMQConnection(BaseConnection):
     _connection: SelectConnection
 
     def __init__(
-            self,
-            event_loop: AbstractEventLoop = None,
-            on_connection_open: Callable = None,
-            on_connection_closed: Callable = None,
-            on_connection_stop_called: Callable = None,
-            logger: Logger = _LOGGER,
-            **kwargs
+        self,
+        event_loop: AbstractEventLoop = None,
+        on_connection_open: Callable = None,
+        on_connection_closed: Callable = None,
+        on_connection_stop_called: Callable = None,
+        logger: Logger = _LOGGER,
+        **kwargs,
     ) -> None:
 
         super().__init__(logger, **kwargs)
@@ -67,7 +67,7 @@ class AsyncRabbitMQConnection(BaseConnection):
             parameters,
             on_open_callback=self.on_connection_open,
             on_open_error_callback=self.on_connection_open_error,
-            on_close_callback=self.on_connection_closed
+            on_close_callback=self.on_connection_closed,
         )
         Thread(target=self._connection.ioloop.start).start()  # noqa
 

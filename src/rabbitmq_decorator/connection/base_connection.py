@@ -16,7 +16,7 @@ class BaseConnection(ABC):
         self._port = int(kwargs.get("rabbitmq_port", os.environ.get("RABBITMQ_PORT", self.DEFAULT_RABBITMQ_PORT)))
         self._credentials = PlainCredentials(
             username=kwargs.get("rabbitmq_username", os.environ.get("RABBITMQ_USERNAME")),
-            password=kwargs.get("rabbitmq_password", os.environ.get("RABBITMQ_PASSWORD"))
+            password=kwargs.get("rabbitmq_password", os.environ.get("RABBITMQ_PASSWORD")),
         )
 
         self._connection = None

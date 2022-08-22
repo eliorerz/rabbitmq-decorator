@@ -28,8 +28,9 @@ class RabbitMQProducer:
 
     def __get_channel(self, exchange: Exchange) -> Channel:
         if exchange is None:
-            raise ValueError(f"Exchange is mandatory property for publishing a messages using "
-                             f"{self.__class__.__name__}")
+            raise ValueError(
+                f"Exchange is mandatory property for publishing a messages using " f"{self.__class__.__name__}"
+            )
 
         if channel := self._channels.get(exchange.exchange):
             return channel

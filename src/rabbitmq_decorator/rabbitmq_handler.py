@@ -8,9 +8,9 @@ from pika.amqp_object import Method
 
 from . import RabbitMQConnection
 from ._common import DECORATOR_ATTRIBUTE, Exchange
-from .rabbitmq_consumer import RabbitMQConsumer
 from ._logger import _LOGGER
 from .connection import AsyncRabbitMQConnection
+from .rabbitmq_consumer import RabbitMQConsumer
 from .rabbitmq_producer import RabbitMQProducer
 
 
@@ -20,7 +20,9 @@ class RabbitMQHandler:
     def __init__(self, event_loop: AbstractEventLoop = None, logger: Logger = _LOGGER, **connection_kwargs) -> None:
         self._consumers: List[RabbitMQConsumer] = []
         self._event_loop = event_loop if event_loop else asyncio.get_event_loop()
-        self._consumer_connection = AsyncRabbitMQConnection(event_loop, self._on_consumer_connection_open, **connection_kwargs)
+        self._consumer_connection = AsyncRabbitMQConnection(
+            event_loop, self._on_consumer_connection_open, **connection_kwargs
+        )
         self._producer_connection = RabbitMQConnection(logger, **connection_kwargs)
         self._logger = logger
         self._closing = False
@@ -91,8 +93,7 @@ class RabbitMQHandler:
             self._logger.info("Consumer stopped")
 
     def _stop_consuming(self, consumer: RabbitMQConsumer):
-        """Tell RabbitMQ that you would like to stop consuming by sending the Basic.Cancel RPC command.
-        """
+        """Tell RabbitMQ that you would like to stop consuming by sending the Basic.Cancel RPC command."""
         if consumer.channel:
             self._logger.info("Sending a Basic.Cancel RPC command to RabbitMQ")
             consumer.basic_cancel(callback=functools.partial(self._consumer_on_cancelok, userdata=consumer))

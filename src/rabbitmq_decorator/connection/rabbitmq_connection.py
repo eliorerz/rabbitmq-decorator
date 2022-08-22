@@ -1,11 +1,11 @@
 from logging import Logger
 from typing import Callable
 
-from pika import ConnectionParameters, BlockingConnection, BasicProperties
+from pika import BasicProperties, BlockingConnection, ConnectionParameters
 from pika.adapters.blocking_connection import BlockingChannel
 
-from .base_connection import BaseConnection
 from .._logger import _LOGGER
+from .base_connection import BaseConnection
 
 
 class RabbitMQConnection(BaseConnection):
